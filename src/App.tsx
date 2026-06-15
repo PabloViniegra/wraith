@@ -1,8 +1,7 @@
 import { Box, Text, useApp, useInput, useStdout } from 'ink'
 import { useEffect, useMemo, useState } from 'react'
-import { Footer } from './components/Footer'
-import { Header } from './components/Header'
-import { type Column, Table } from './components/Table'
+import { procColumns } from './features/processes/columns'
+import { svcColumns } from './features/services/columns'
 import { usePolling } from './hooks/usePolling'
 import { USE_MOCK } from './lib/config'
 import { killProcess, listProcesses, type ProcInfo } from './lib/processes'
@@ -14,63 +13,24 @@ import {
   stopService,
 } from './lib/services'
 import { getSystemStats, type SysStats } from './lib/system'
-import { theme } from './theme'
+import { theme } from './styles/theme'
+import { Footer } from './ui/components/Footer'
+import { Header } from './ui/components/Header'
+import { Table } from './ui/components/Table'
+import { Spinner } from './ui/primitives/Spinner'
 
 type View = 'processes' | 'services'
 type Status = { text: string; kind: 'info' | 'ok' | 'err' }
 type Confirm = { message: string; run: () => Promise<void> }
 
+const STATUS_ICON: Record<Status['kind'], string> = {
+  ok: '✓',
+  err: '✗',
+  info: 'ℹ',
+}
+
 const clampIndex = (i: number, len: number) =>
   len === 0 ? 0 : Math.max(0, Math.min(i, len - 1))
-
-const procColumns: Column<ProcInfo>[] = [
-  {
-    key: 'pid',
-    header: 'PID',
-    width: 7,
-    align: 'right',
-    value: (p) => String(p.Id),
-  },
-  { key: 'name', header: 'PROCESS', width: 28, value: (p) => p.ProcessName },
-  {
-    key: 'cpu',
-    header: 'CPU(s)',
-    width: 9,
-    align: 'right',
-    value: (p) => String(p.CPU ?? 0),
-  },
-  {
-    key: 'mem',
-    header: 'MEM(MB)',
-    width: 10,
-    align: 'right',
-    value: (p) => p.MemMB.toFixed(1),
-    color: (p) => (p.MemMB > 500 ? theme.warn : undefined),
-  },
-]
-
-const svcColumns: Column<ServiceInfo>[] = [
-  {
-    key: 'status',
-    header: 'STATE',
-    width: 9,
-    value: (s) => s.Status,
-    color: (s) =>
-      s.Status === 'Running'
-        ? theme.bright
-        : s.Status === 'Stopped'
-          ? theme.danger
-          : theme.warn,
-  },
-  { key: 'name', header: 'NAME', width: 22, value: (s) => s.Name },
-  {
-    key: 'disp',
-    header: 'DISPLAY NAME',
-    width: 38,
-    value: (s) => s.DisplayName,
-  },
-  { key: 'start', header: 'STARTUP', width: 11, value: (s) => s.StartType },
-]
 
 export function App() {
   const { exit } = useApp()
@@ -89,6 +49,15 @@ export function App() {
   const procs = usePolling<ProcInfo[]>(listProcesses, 2500, [])
   const svcs = usePolling<ServiceInfo[]>(listServices, 4000, [])
   const sys = usePolling<SysStats | null>(getSystemStats, 3000, null)
+
+  // Most recent successful update across all data sources
+  const lastUpdated = useMemo(() => {
+    const dates = [procs.lastUpdated, svcs.lastUpdated, sys.lastUpdated].filter(
+      Boolean,
+    ) as Date[]
+    if (!dates.length) return null
+    return new Date(Math.max(...dates.map((d) => d.getTime())))
+  }, [procs.lastUpdated, svcs.lastUpdated, sys.lastUpdated])
 
   const fProcs = useMemo(() => {
     const f = filter.toLowerCase()
@@ -115,7 +84,6 @@ export function App() {
   const flash = (text: string, kind: Status['kind']) =>
     setStatus({ text, kind })
 
-  // Auto-limpiar el mensaje de estado.
   useEffect(() => {
     if (!status) return
     const t = setTimeout(() => setStatus(null), 4000)
@@ -131,7 +99,6 @@ export function App() {
   }
 
   useInput((input, key) => {
-    // --- Diálogo de confirmación ---
     if (confirm) {
       if (input === 'y' || input === 'Y') {
         const run = confirm.run
@@ -147,7 +114,6 @@ export function App() {
       return
     }
 
-    // --- Modo filtro (captura de texto) ---
     if (filtering) {
       if (key.return || key.escape) setFiltering(false)
       else if (key.backspace || key.delete) setFilter((f) => f.slice(0, -1))
@@ -155,7 +121,6 @@ export function App() {
       return
     }
 
-    // --- Navegación general ---
     if (input === 'q' || (key.ctrl && input === 'c')) return exit()
     if (key.tab || key.leftArrow || key.rightArrow) {
       setView((v) => (v === 'processes' ? 'services' : 'processes'))
@@ -177,13 +142,12 @@ export function App() {
       return
     }
 
-    // --- Acciones por vista ---
     if (view === 'processes') {
       if (input === 'x' || key.delete) {
         const p = fProcs[sel]
         if (!p) return
         setConfirm({
-          message: `\u00bfTerminar ${p.ProcessName} (PID ${p.Id})?`,
+          message: `¿Terminar ${p.ProcessName} (PID ${p.Id})?`,
           run: () => killProcess(p.Id).then(() => void procs.refresh()),
         })
       }
@@ -203,12 +167,12 @@ export function App() {
         )
     } else if (input === 's') {
       setConfirm({
-        message: `\u00bfDetener servicio "${s.DisplayName}"?`,
+        message: `¿Detener servicio "${s.DisplayName}"?`,
         run: () => stopService(s.Name).then(() => void svcs.refresh()),
       })
     } else if (input === 'r') {
       setConfirm({
-        message: `\u00bfReiniciar servicio "${s.DisplayName}"?`,
+        message: `¿Reiniciar servicio "${s.DisplayName}"?`,
         run: () => restartService(s.Name).then(() => void svcs.refresh()),
       })
     }
@@ -220,13 +184,13 @@ export function App() {
       ? procs.loading && fProcs.length === 0
       : svcs.loading && fSvcs.length === 0
 
-  const tab = (label: string, active: boolean) => (
+  const tab = (icon: string, label: string, active: boolean) => (
     <Text
       bold
       color={active ? theme.selectionFg : theme.dim}
       backgroundColor={active ? theme.fg : undefined}
     >
-      {` ${label} `}
+      {` ${icon} ${label} `}
     </Text>
   )
 
@@ -237,12 +201,13 @@ export function App() {
         procCount={procs.data.length}
         svcCount={svcs.data.length}
         mock={USE_MOCK}
+        lastUpdated={lastUpdated}
       />
 
       <Box paddingX={1}>
-        {tab('PROCESSES', view === 'processes')}
+        {tab('⚙', 'PROCESSES', view === 'processes')}
         <Text> </Text>
-        {tab('SERVICES', view === 'services')}
+        {tab('⚙', 'SERVICES', view === 'services')}
         {filter ? (
           <Text color={theme.accent}>{`   filtro: ${filter}`}</Text>
         ) : null}
@@ -255,9 +220,9 @@ export function App() {
         flexDirection='column'
       >
         {error ? (
-          <Text color={theme.danger}>{`\u26a0 ${error}`}</Text>
+          <Text color={theme.danger}>{`⚠ ${error}`}</Text>
         ) : loading ? (
-          <Text color={theme.dim}>{'escaneando el sistema\u2026'}</Text>
+          <Spinner label='escaneando el sistema…' />
         ) : view === 'processes' ? (
           <Table
             columns={procColumns}
@@ -286,15 +251,16 @@ export function App() {
                   : theme.accent
             }
           >
-            {`\u00bb ${status.text}`}
+            {`${STATUS_ICON[status.kind]} ${status.text}`}
           </Text>
         </Box>
       ) : null}
 
       {confirm ? (
         <Box borderStyle='round' borderColor={theme.warn} paddingX={1}>
-          <Text color={theme.warn}>{`${confirm.message} `}</Text>
-          <Text color={theme.bright}>[y/n]</Text>
+          <Text color={theme.warn}>{`⚠ ${confirm.message} `}</Text>
+          <Text color={theme.danger}>[Y]</Text>
+          <Text color={theme.dim}>/[n]</Text>
         </Box>
       ) : (
         <Footer view={view} filtering={filtering} filter={filter} />
