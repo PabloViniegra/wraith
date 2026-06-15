@@ -1,8 +1,8 @@
 import { Box, Text } from 'ink'
-import { theme } from '../theme'
+import { theme } from '../../styles/theme'
 
-const DOT = '\u00b7'
-const CURSOR = '\u2588'
+const DOT = '·'
+const CURSOR = '█'
 
 interface Props {
   view: 'processes' | 'services'
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function Footer({ view, filtering, filter }: Props) {
-  const common = `\u2191\u2193/jk mover ${DOT} Tab cambiar ${DOT} / filtrar ${DOT} R refrescar ${DOT} q salir`
+  const common = `↑↓/jk mover ${DOT} Tab cambiar ${DOT} / filtrar ${DOT} R refrescar ${DOT} q salir`
   const perView =
     view === 'processes'
       ? 'x terminar proceso'

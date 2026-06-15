@@ -1,5 +1,5 @@
 import { Box, Text } from 'ink'
-import { theme } from '../theme'
+import { theme } from '../../styles/theme'
 
 export interface Column<T> {
   key: string
@@ -7,7 +7,6 @@ export interface Column<T> {
   width: number
   align?: 'left' | 'right'
   value: (row: T) => string
-  /** Color opcional para la celda (no aplica en la fila seleccionada). */
   color?: (row: T) => string | undefined
 }
 
@@ -25,7 +24,6 @@ interface Props<T> {
 }
 
 export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
-  // Ventana de scroll centrada (en lo posible) en la fila seleccionada.
   const half = Math.floor(visible / 2)
   let start = Math.max(0, selected - half)
   start = Math.min(start, Math.max(0, rows.length - visible))
@@ -33,7 +31,6 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
 
   return (
     <Box flexDirection='column'>
-      {/* Cabecera */}
       <Box>
         <Text> </Text>
         {columns.map((c, ci) => (
@@ -44,7 +41,6 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
         ))}
       </Box>
 
-      {/* Filas */}
       {slice.map((row, i) => {
         const idx = start + i
         const isSelected = idx === selected
@@ -60,7 +56,7 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
               color={theme.selectionFg}
               bold
             >
-              {`\u258c${line} `}
+              {`▌${line} `}
             </Text>
           )
         }

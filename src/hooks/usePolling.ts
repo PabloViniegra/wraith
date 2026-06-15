@@ -12,6 +12,7 @@ export function usePolling<T>(
   const [data, setData] = useState<T>(initial)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const mounted = useRef(true)
   const fnRef = useRef(fn)
   fnRef.current = fn
@@ -22,6 +23,7 @@ export function usePolling<T>(
       if (mounted.current) {
         setData(result)
         setError(null)
+        setLastUpdated(new Date())
       }
     } catch (e) {
       if (mounted.current) {
@@ -42,5 +44,5 @@ export function usePolling<T>(
     }
   }, [refresh, intervalMs])
 
-  return { data, error, loading, refresh }
+  return { data, error, loading, refresh, lastUpdated }
 }
