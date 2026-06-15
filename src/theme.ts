@@ -8,4 +8,4 @@ export const theme = {
   danger: '#ff003c', // rojo (errores / detenido)
   border: '#00ff41',
   selectionFg: '#000000', // texto de la fila seleccionada
-} as const;
+} as const

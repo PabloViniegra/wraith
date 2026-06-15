@@ -10,9 +10,13 @@
 	"scripts": {
 		"dev": "bun run src/cli.tsx",
 		"mock": "bun run src/cli.tsx --mock",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"format": "biome format --write src",
+		"lint": "biome lint src",
+		"check": "biome check --write src"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.5.0",
 		"@types/bun": "latest",
 		"@types/react": "^19.2.17"
 	},

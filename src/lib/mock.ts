@@ -1,13 +1,36 @@
-import type { ProcInfo } from './processes';
-import type { ServiceInfo } from './services';
-import type { SysStats } from './system';
+import type { ProcInfo } from './processes'
+import type { ServiceInfo } from './services'
+import type { SysStats } from './system'
 
 const PROC_NAMES = [
-  'chrome', 'Code', 'bun', 'node', 'explorer', 'svchost', 'powershell',
-  'Discord', 'Spotify', 'steam', 'docker', 'pwsh', 'Teams', 'OneDrive',
-  'dwm', 'csrss', 'lsass', 'RuntimeBroker', 'SearchHost', 'WindowsTerminal',
-  'firefox', 'notepad', 'cmd', 'conhost', 'python', 'java', 'postgres',
-];
+  'chrome',
+  'Code',
+  'bun',
+  'node',
+  'explorer',
+  'svchost',
+  'powershell',
+  'Discord',
+  'Spotify',
+  'steam',
+  'docker',
+  'pwsh',
+  'Teams',
+  'OneDrive',
+  'dwm',
+  'csrss',
+  'lsass',
+  'RuntimeBroker',
+  'SearchHost',
+  'WindowsTerminal',
+  'firefox',
+  'notepad',
+  'cmd',
+  'conhost',
+  'python',
+  'java',
+  'postgres',
+]
 
 const SERVICES = [
   ['Spooler', 'Print Spooler', 'Running', 'Automatic'],
@@ -22,9 +45,9 @@ const SERVICES = [
   ['LanmanServer', 'Server', 'Running', 'Automatic'],
   ['Schedule', 'Task Scheduler', 'Running', 'Automatic'],
   ['Netman', 'Network Connections', 'Running', 'Manual'],
-] as const;
+] as const
 
-let killed = new Set<number>();
+const killed = new Set<number>()
 
 export function mockProcesses(): ProcInfo[] {
   return PROC_NAMES.map((name, i) => ({
@@ -34,11 +57,11 @@ export function mockProcesses(): ProcInfo[] {
     MemMB: Math.round((20 + Math.random() * 900) * 10) / 10,
   }))
     .filter((p) => !killed.has(p.Id))
-    .sort((a, b) => b.MemMB - a.MemMB);
+    .sort((a, b) => b.MemMB - a.MemMB)
 }
 
 export function mockKill(id: number): void {
-  killed.add(id);
+  killed.add(id)
 }
 
 export function mockServices(): ServiceInfo[] {
@@ -47,7 +70,7 @@ export function mockServices(): ServiceInfo[] {
     DisplayName,
     Status,
     StartType,
-  }));
+  }))
 }
 
 export function mockSystem(): SysStats {
@@ -55,5 +78,5 @@ export function mockSystem(): SysStats {
     CpuPct: Math.round(15 + Math.random() * 70),
     MemUsedMB: Math.round(9000 + Math.random() * 4000),
     MemTotalMB: 16384,
-  };
+  }
 }
