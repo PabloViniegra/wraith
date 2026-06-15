@@ -1,27 +1,26 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { theme } from '../theme';
+import { Box, Text } from 'ink'
+import { theme } from '../theme'
 
-const DOT = '\u00b7';
-const CURSOR = '\u2588';
+const DOT = '\u00b7'
+const CURSOR = '\u2588'
 
 interface Props {
-  view: 'processes' | 'services';
-  filtering: boolean;
-  filter: string;
+  view: 'processes' | 'services'
+  filtering: boolean
+  filter: string
 }
 
 export function Footer({ view, filtering, filter }: Props) {
-  const common = `\u2191\u2193/jk mover ${DOT} Tab cambiar ${DOT} / filtrar ${DOT} R refrescar ${DOT} q salir`;
+  const common = `\u2191\u2193/jk mover ${DOT} Tab cambiar ${DOT} / filtrar ${DOT} R refrescar ${DOT} q salir`
   const perView =
     view === 'processes'
       ? 'x terminar proceso'
-      : `e iniciar ${DOT} s detener ${DOT} r reiniciar`;
+      : `e iniciar ${DOT} s detener ${DOT} r reiniciar`
 
   return (
     <Box
-      flexDirection="column"
-      borderStyle="round"
+      flexDirection='column'
+      borderStyle='round'
       borderColor={theme.dim}
       paddingX={1}
     >
@@ -35,5 +34,5 @@ export function Footer({ view, filtering, filter }: Props) {
         </Text>
       )}
     </Box>
-  );
+  )
 }

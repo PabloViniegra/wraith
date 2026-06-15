@@ -1,39 +1,38 @@
-import React from 'react';
-import { Box, Text } from 'ink';
-import { theme } from '../theme';
+import { Box, Text } from 'ink'
+import { theme } from '../theme'
 
 export interface Column<T> {
-  key: string;
-  header: string;
-  width: number;
-  align?: 'left' | 'right';
-  value: (row: T) => string;
+  key: string
+  header: string
+  width: number
+  align?: 'left' | 'right'
+  value: (row: T) => string
   /** Color opcional para la celda (no aplica en la fila seleccionada). */
-  color?: (row: T) => string | undefined;
+  color?: (row: T) => string | undefined
 }
 
 function pad(text: string, width: number, align: 'left' | 'right' = 'left') {
-  let s = text;
-  if (s.length > width) s = s.slice(0, Math.max(0, width - 1)) + '…';
-  return align === 'right' ? s.padStart(width) : s.padEnd(width);
+  let s = text
+  if (s.length > width) s = `${s.slice(0, Math.max(0, width - 1))}…`
+  return align === 'right' ? s.padStart(width) : s.padEnd(width)
 }
 
 interface Props<T> {
-  columns: Column<T>[];
-  rows: T[];
-  selected: number;
-  visible: number;
+  columns: Column<T>[]
+  rows: T[]
+  selected: number
+  visible: number
 }
 
 export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
   // Ventana de scroll centrada (en lo posible) en la fila seleccionada.
-  const half = Math.floor(visible / 2);
-  let start = Math.max(0, selected - half);
-  start = Math.min(start, Math.max(0, rows.length - visible));
-  const slice = rows.slice(start, start + visible);
+  const half = Math.floor(visible / 2)
+  let start = Math.max(0, selected - half)
+  start = Math.min(start, Math.max(0, rows.length - visible))
+  const slice = rows.slice(start, start + visible)
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection='column'>
       {/* Cabecera */}
       <Box>
         <Text> </Text>
@@ -47,13 +46,13 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
 
       {/* Filas */}
       {slice.map((row, i) => {
-        const idx = start + i;
-        const isSelected = idx === selected;
+        const idx = start + i
+        const isSelected = idx === selected
 
         if (isSelected) {
           const line = columns
             .map((c) => pad(c.value(row), c.width, c.align))
-            .join(' ');
+            .join(' ')
           return (
             <Text
               key={idx}
@@ -63,7 +62,7 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
             >
               {`\u258c${line} `}
             </Text>
-          );
+          )
         }
 
         return (
@@ -76,12 +75,10 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
               </Text>
             ))}
           </Box>
-        );
+        )
       })}
 
-      {rows.length === 0 && (
-        <Text color={theme.dim}> (sin resultados)</Text>
-      )}
+      {rows.length === 0 && <Text color={theme.dim}> (sin resultados)</Text>}
     </Box>
-  );
+  )
 }
