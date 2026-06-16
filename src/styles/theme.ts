@@ -1,11 +1,12 @@
-// Paleta "hacking": verde matrix sobre negro, con acentos cian/ámbar/rojo.
 export const theme = {
-  fg: '#00ff41',
-  dim: '#1f7a33',
-  bright: '#7cffb0',
-  accent: '#00e5ff',
-  warn: '#ffea00',
+  fg: '#00f5ff',
+  accent: '#ff006e',
+  bright: '#39ff14',
+  dim: '#0a3a4a',
+  warn: '#ff9500',
   danger: '#ff003c',
-  border: '#00ff41',
+  selectionBg: '#ff006e',
   selectionFg: '#000000',
+  border: '#00f5ff',
+  borderSecondary: '#0a3a4a',
 } as const

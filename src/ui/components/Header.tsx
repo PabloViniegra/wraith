@@ -5,6 +5,12 @@ import { EyeGlyph } from '../primitives/EyeGlyph'
 import { GlitchBanner } from '../primitives/GlitchBanner'
 import { StatusBar } from '../primitives/StatusBar'
 
+export function barColor(pct: number): string {
+  if (pct >= 80) return theme.accent
+  if (pct >= 50) return theme.warn
+  return theme.bright
+}
+
 function bar(pct: number, width = 16) {
   const clamped = Math.min(100, Math.max(0, pct))
   const filled = Math.round((clamped / 100) * width)
@@ -35,9 +41,9 @@ export function Header({ sys, procCount, svcCount, mock, lastUpdated }: Props) {
       <Box flexDirection='column'>
         <Box>
           <EyeGlyph />
-          <Text color={theme.dim}> </Text>
-          <Text color={theme.accent} bold>
-            {mock ? 'WRAITH [MOCK]' : 'WRAITH'}
+          <Text> </Text>
+          <Text color={theme.selectionFg} backgroundColor={theme.fg} bold>
+            {mock ? ' WRAITH [MOCK] ' : ' WRAITH '}
           </Text>
         </Box>
         <GlitchBanner />
@@ -48,19 +54,17 @@ export function Header({ sys, procCount, svcCount, mock, lastUpdated }: Props) {
         <Text color={theme.dim}>{new Date().toLocaleTimeString()}</Text>
         <Text> </Text>
         <Text color={theme.fg}>
-          CPU [
-          <Text color={cpu > 80 ? theme.danger : theme.bright}>{bar(cpu)}</Text>
-          ] {String(cpu).padStart(3)}%
+          {'CPU ['}
+          <Text color={barColor(cpu)}>{bar(cpu)}</Text>
+          {`] ${String(cpu).padStart(3)}%`}
         </Text>
         <Text color={theme.fg}>
-          MEM [
-          <Text color={memPct > 80 ? theme.danger : theme.bright}>
-            {bar(memPct)}
-          </Text>
-          ] {String(memPct).padStart(3)}%
+          {'MEM ['}
+          <Text color={barColor(memPct)}>{bar(memPct)}</Text>
+          {`] ${String(memPct).padStart(3)}%`}
         </Text>
         <Text color={theme.dim}>
-          procs:{procCount} svcs:{svcCount}
+          procs:{procCount} ◆ svcs:{svcCount}
         </Text>
       </Box>
     </Box>

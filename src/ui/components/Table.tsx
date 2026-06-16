@@ -34,7 +34,7 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
       <Box>
         <Text> </Text>
         {columns.map((c, ci) => (
-          <Text key={c.key} color={theme.accent} bold>
+          <Text key={c.key} color={theme.accent} bold underline>
             {pad(c.header, c.width, c.align)}
             {ci < columns.length - 1 ? ' ' : ''}
           </Text>
@@ -52,11 +52,11 @@ export function Table<T>({ columns, rows, selected, visible }: Props<T>) {
           return (
             <Text
               key={idx}
-              backgroundColor={theme.fg}
+              backgroundColor={theme.selectionBg}
               color={theme.selectionFg}
               bold
             >
-              {`▌${line} `}
+              {`▐${line} `}
             </Text>
           )
         }

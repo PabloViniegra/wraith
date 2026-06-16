@@ -1,7 +1,7 @@
 import { Box, Text } from 'ink'
 import { theme } from '../../styles/theme'
 
-const DOT = '·'
+const SEP = '◆'
 const CURSOR = '█'
 
 interface Props {
@@ -11,25 +11,25 @@ interface Props {
 }
 
 export function Footer({ view, filtering, filter }: Props) {
-  const common = `↑↓/jk mover ${DOT} Tab cambiar ${DOT} / filtrar ${DOT} R refrescar ${DOT} q salir`
+  const common = `↑↓/jk mover ${SEP} Tab cambiar ${SEP} / filtrar ${SEP} R refrescar ${SEP} q salir`
   const perView =
     view === 'processes'
-      ? 'x terminar proceso'
-      : `e iniciar ${DOT} s detener ${DOT} r reiniciar`
+      ? '▸ x terminar proceso'
+      : `▸ e iniciar ${SEP} s detener ${SEP} r reiniciar`
 
   return (
     <Box
       flexDirection='column'
       borderStyle='round'
-      borderColor={theme.dim}
+      borderColor={theme.borderSecondary}
       paddingX={1}
     >
       <Text color={theme.dim}>
-        <Text color={theme.fg}>{perView}</Text> {DOT} {common}
+        <Text color={theme.fg}>{perView}</Text> {SEP} {common}
       </Text>
       {filtering && (
         <Text color={theme.accent}>
-          filtro: {filter}
+          ▸ filtro: {filter}
           <Text color={theme.bright}>{CURSOR}</Text>
         </Text>
       )}
