@@ -17,5 +17,7 @@ export function StatusBar({ lastUpdated }: Props) {
 
   const secs = Math.floor((Date.now() - lastUpdated.getTime()) / 1000)
   const stale = secs > 30
-  return <Text color={stale ? theme.warn : theme.dim}>updated {secs}s ago</Text>
+  return (
+    <Text color={stale ? theme.accent : theme.dim}>updated {secs}s ago</Text>
+  )
 }

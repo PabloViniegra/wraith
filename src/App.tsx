@@ -23,10 +23,10 @@ type View = 'processes' | 'services'
 type Status = { text: string; kind: 'info' | 'ok' | 'err' }
 type Confirm = { message: string; run: () => Promise<void> }
 
-const STATUS_ICON: Record<Status['kind'], string> = {
-  ok: '✓',
-  err: '✗',
-  info: 'ℹ',
+export const STATUS_ICON: Record<Status['kind'], string> = {
+  ok: '⚡',
+  err: '☠',
+  info: '◈',
 }
 
 const clampIndex = (i: number, len: number) =>
@@ -188,7 +188,7 @@ export function App() {
     <Text
       bold
       color={active ? theme.selectionFg : theme.dim}
-      backgroundColor={active ? theme.fg : undefined}
+      backgroundColor={active ? theme.selectionBg : undefined}
     >
       {` ${icon} ${label} `}
     </Text>
@@ -205,16 +205,16 @@ export function App() {
       />
 
       <Box paddingX={1}>
-        {tab('⚙', 'PROCESSES', view === 'processes')}
-        <Text> </Text>
-        {tab('⚙', 'SERVICES', view === 'services')}
+        {tab('⚡', 'PROCESSES', view === 'processes')}
+        <Text color={theme.dim}> ◆ </Text>
+        {tab('◈', 'SERVICES', view === 'services')}
         {filter ? (
-          <Text color={theme.accent}>{`   filtro: ${filter}`}</Text>
+          <Text color={theme.accent}>{`   ▸ filtro: ${filter}`}</Text>
         ) : null}
       </Box>
 
       <Box
-        borderStyle='round'
+        borderStyle='double'
         borderColor={theme.border}
         paddingX={1}
         flexDirection='column'
@@ -257,8 +257,8 @@ export function App() {
       ) : null}
 
       {confirm ? (
-        <Box borderStyle='round' borderColor={theme.warn} paddingX={1}>
-          <Text color={theme.warn}>{`⚠ ${confirm.message} `}</Text>
+        <Box borderStyle='round' borderColor={theme.accent} paddingX={1}>
+          <Text color={theme.accent}>{`⚠ ${confirm.message} `}</Text>
           <Text color={theme.danger}>[Y]</Text>
           <Text color={theme.dim}>/[n]</Text>
         </Box>
